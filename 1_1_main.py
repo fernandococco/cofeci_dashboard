@@ -41,11 +41,11 @@ col1, col_empty, col2 = st.columns([1, 2, 1])
 
 # Na primeira coluna, adicionar o logo do Cofeci
 with col1:
-    st.image('cofeci2.png', width=100)  # Ajuste a largura conforme necessário
+    st.image('cofeci3.jpeg', width=100)  # Ajuste a largura conforme necessário
 
 # Na segunda coluna, adicionar o logo do Rei
 with col2:
-    st.image('rei.png', width=100)  # Ajuste a largura conforme necessário
+    st.image('125.1_LOGO REI-01.png', width=100)  # Ajuste a largura conforme necessário
 
 
 def plot_bar_chart_perg5(data):
@@ -121,7 +121,6 @@ def plot_donut_chart_perg9(data):
     st.plotly_chart(fig)
 
 
-
 # Carregar os dados
 data = load_data()
 
@@ -130,29 +129,30 @@ selected_perg_6 = st.sidebar.multiselect(
     'Selecione o Estado:', 
     sorted(data['PERG.6'].unique())  # Ordenando os estados em ordem alfabética
 )
+
 # Filtrar dados com base no estado selecionado para a próxima escolha
 if selected_perg_6:
     filtered_data_by_perg_6 = data[data['PERG.6'].isin(selected_perg_6)]
     
-    # Filtro por Interior ou Capital (PERG.7)
-    selected_perg_7 = st.sidebar.radio("Selecione Interior ou Capital:", filtered_data_by_perg_6['PERG.7'].unique())
-    
-    # Filtrar dados com base em Interior ou Capital
-    filtered_data_by_perg_7 = filtered_data_by_perg_6[filtered_data_by_perg_6['PERG.7'] == selected_perg_7]
-    
-    # Filtro por Cidade (PERG.8), mostrando apenas as cidades do(s) estado(s) selecionado(s) e da escolha Interior/Capital
-    selected_perg_8 = st.sidebar.multiselect('Selecione a Cidade:', filtered_data_by_perg_7['PERG.8'].unique())
-    
-    # Aplicar filtro final com base na cidade selecionada
-    if selected_perg_8:
-        final_filtered_data = filtered_data_by_perg_7[filtered_data_by_perg_7['PERG.8'].isin(selected_perg_8)]
-    else:
-        final_filtered_data = filtered_data_by_perg_7
-else:
-    final_filtered_data = pd.DataFrame(columns=data.columns)  # DataFrame vazio se nenhum estado for selecionado
+    # Filtro por Interior ou Capital (PERG.7) usando st.radio
+    # Incluindo 'Ambos' como uma opção para permitir seleção de todos os dados
+    options_perg_7 = ['Ambos', 'Capital', 'Interior']
+    selected_perg_7 = st.sidebar.radio("Selecione Interior ou Capital:", options=options_perg_7)
 
-# Exibir o gráfico de rosca baseado nos dados filtrados
+    # Aplicar filtros com base em Interior ou Capital
+    if selected_perg_7 == 'Ambos':
+        # Se 'Ambos' for selecionado, não filtrar por este critério
+        final_filtered_data = filtered_data_by_perg_6
+    else:
+        # Se 'Capital' ou 'Interior' for selecionado, filtrar por esse critério
+        final_filtered_data = filtered_data_by_perg_6[filtered_data_by_perg_6['PERG.7'] == selected_perg_7]
+else:
+    # Se nenhum estado for selecionado, criar um DataFrame vazio
+    final_filtered_data = pd.DataFrame(columns=data.columns)
+
+# Verificar se há dados filtrados para exibir
 if not final_filtered_data.empty:
+    # Chamadas para as funções de plotagem dos gráficos
     plot_bar_chart_perg5(final_filtered_data)
     plot_donut_chart_perg9(final_filtered_data)
 else:
