@@ -7,31 +7,27 @@ from PIL import Image
 
 def check_password():
     """Returns `True` if the user had the correct password."""
-
     def password_entered():
         """Checks whether a password entered by the user is correct."""
         if hmac.compare_digest(st.session_state["password"], st.secrets["password"]):
             st.session_state["password_correct"] = True
-            del st.session_state["password"]  # Don't store the password.
+            del st.session_state["password"]
         else:
             st.session_state["password_correct"] = False
 
-    # Return True if the password is validated.
     if st.session_state.get("password_correct", False):
         return True
 
-    # Show input for password.
     password = st.text_input("Senha: ", type="password", key="password")
-    
-    # Habilitar o botão quando a senha for preenchida.
-    password_entered_button = st.button("Enviar Senha", on_click=password_entered)
+    st.button("Enviar Senha", on_click=password_entered)
 
     if "password_correct" in st.session_state:
-        st.error("Senha Incorreta. ")
+        st.error("Senha Incorreta.")
+
     return False
 
 if not check_password():
-    st.stop()  # Do not continue if check_password is not True.
+    st.stop()
 
 def load_data():
     data = pd.read_csv('cofeci.csv')
@@ -39,13 +35,14 @@ def load_data():
 
 col1, col_empty, col2 = st.columns([1, 2, 1])
 
-# Na primeira coluna, adicionar o logo do Cofeci
 with col1:
-    st.image('cofeci3.jpeg', width=100)  # Ajuste a largura conforme necessário
+    st.image('cofeci3.jpeg', width=100)
 
-# Na segunda coluna, adicionar o logo do Rei
 with col2:
-    st.image('125.1_LOGO REI-01.png', width=100)  # Ajuste a largura conforme necessário
+    st.image('125.1_LOGO REI-01.png', width=100)
+
+
+
 
 
 def plot_bar_chart_perg5(data):
@@ -96,8 +93,6 @@ def plot_bar_chart_perg5(data):
     st.plotly_chart(fig)
 
 
-
-
 def plot_donut_chart_perg9(data):
     # Contar os valores únicos na coluna 'PERG.9' e resetar o índice para transformar em DataFrame
     values_df = data['PERG.9'].value_counts().reset_index()
@@ -120,8 +115,16 @@ def plot_donut_chart_perg9(data):
     # Exibir o gráfico no Streamlit
     st.plotly_chart(fig)
 
+data = load_data()
 
-# Mapeamento de Regiões para Estados
+# Filtro por Região do Brasil
+selected_regiao = st.sidebar.selectbox(
+    'Selecione a Região:', 
+    ['Selecione uma opção', 'Brasil', 'Centro-Oeste', 'Nordeste', 'Norte', 'Sudeste', 'Sul'],
+    index=0
+)
+
+# Mapeamento de Regiões para Estados (exemplo genérico, ajuste conforme necessário)
 regioes_estados = {
     'Centro-Oeste': ['Goiás (GO)', 'Mato Grosso (MT)', 'Mato Grosso do Sul (MS)', 'Distrito Federal (DF)'],
     'Nordeste': ['Alagoas (AL)', 'Bahia (BA)', 'Ceará (CE)', 'Maranhão (MA)', 'Paraíba (PB)', 'Pernambuco (PE)', 'Piauí (PI)', 'Rio Grande do Norte (RN)', 'Sergipe (SE)'],
@@ -131,62 +134,36 @@ regioes_estados = {
     'Brasil': []  # Vazio para selecionar todos os estados
 }
 
-# Carregar os dados
-data = load_data()
-
-# Filtro por Região do Brasil, iniciando sem seleção
-selected_regiao = st.sidebar.selectbox(
-    'Selecione a Região:', 
-    ['Nenhum', 'Brasil', 'Centro-Oeste', 'Nordeste', 'Norte', 'Sudeste', 'Sul'],
-    index=0  # Isso faz com que "Selecione uma opção" seja a opção padrão
-)
-
-# Determinar as opções de estado com base na região selecionada
-if selected_regiao in regioes_estados and selected_regiao != 'Brasil':
-    estados_opcoes = regioes_estados[selected_regiao]
-elif selected_regiao == 'Brasil':
-    estados_opcoes = sorted(data['PERG.6'].unique())
+# Atualizar o filtro de Estados com base na região selecionada
+if selected_regiao != 'Selecione uma opção':
+    if selected_regiao == 'Brasil':
+        estados_opcoes = sorted(data['PERG.6'].unique())
+    else:
+        estados_opcoes = regioes_estados[selected_regiao]
+    selected_estado = st.sidebar.multiselect('Selecione o Estado:', estados_opcoes, default=estados_opcoes)
 else:
-    estados_opcoes = []
+    selected_estado = []
 
-# Atualizar o filtro de Estados para incluir todos os estados da região selecionada por padrão
-selected_estado = st.sidebar.multiselect(
-    'Selecione o Estado:', 
-    estados_opcoes,
-    default=estados_opcoes  # Define todos os estados como selecionados por padrão quando uma região é escolhida
-)
-
-# Filtrar dados com base no estado selecionado
 if selected_estado:
-    filtered_data_by_estado = data[data['PERG.6'].isin(selected_estado)]
-else:
-    filtered_data_by_estado = pd.DataFrame(columns=data.columns)  # DataFrame vazio se nenhum estado for selecionado
-
-# Filtrar dados com base no estado selecionado para a próxima escolha
-if selected_estado:
-    filtered_data_by_perg_6 = data[data['PERG.6'].isin(selected_estado)]
+    filtered_data = data[data['PERG.6'].isin(selected_estado)]
     
-    # Filtro por Interior ou Capital (PERG.7) usando st.radio
-    # Incluindo 'Ambos' como uma opção para permitir seleção de todos os dados
+    # Filtro por Interior ou Capital (PERG.7)
     options_perg_7 = ['Ambos', 'Capital', 'Interior']
     selected_perg_7 = st.sidebar.radio("Selecione Interior ou Capital:", options=options_perg_7)
-
-    # Aplicar filtros com base em Interior ou Capital
-    if selected_perg_7 == 'Ambos':
-        # Se 'Ambos' for selecionado, não filtrar por este critério
-        final_filtered_data = filtered_data_by_perg_6
-    else:
-        # Se 'Capital' ou 'Interior' for selecionado, filtrar por esse critério
-        final_filtered_data = filtered_data_by_perg_6[filtered_data_by_perg_6['PERG.7'] == selected_perg_7]
-else:
-    # Se nenhum estado for selecionado, criar um DataFrame vazio
-    final_filtered_data = pd.DataFrame(columns=data.columns)
-
-# Verificar se há dados filtrados para exibir
-if not final_filtered_data.empty:
-    # Chamadas para as funções de plotagem dos gráficos
-    plot_bar_chart_perg5(final_filtered_data)
-    plot_donut_chart_perg9(final_filtered_data)
+    
+    if selected_perg_7 != 'Ambos':
+        filtered_data = filtered_data[filtered_data['PERG.7'] == selected_perg_7]
+    
+    # Filtro por Escolaridade (PERG.16)
+    escolaridade_opcoes = ['Todos'] + sorted(filtered_data['PERG.16'].dropna().astype(str).unique().tolist())
+    selected_escolaridade = st.sidebar.selectbox("Selecione a Escolaridade:", escolaridade_opcoes, index=0)
+    
+    if selected_escolaridade != 'Todos':
+        filtered_data = filtered_data[filtered_data['PERG.16'].astype(str) == selected_escolaridade]
+    
+    # Aqui você pode chamar as funções para exibir os gráficos com filtered_data
+    plot_bar_chart_perg5(filtered_data)
+    plot_donut_chart_perg9(filtered_data)
 else:
     st.write("Selecione os filtros para visualizar os dados.")
 
