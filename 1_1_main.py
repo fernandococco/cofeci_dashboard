@@ -121,18 +121,49 @@ def plot_donut_chart_perg9(data):
     st.plotly_chart(fig)
 
 
+# Mapeamento de Regiões para Estados
+regioes_estados = {
+    'Centro-Oeste': ['Goiás (GO)', 'Mato Grosso (MT)', 'Mato Grosso do Sul (MS)', 'Distrito Federal (DF)'],
+    'Nordeste': ['Alagoas (AL)', 'Bahia (BA)', 'Ceará (CE)', 'Maranhão (MA)', 'Paraíba (PB)', 'Pernambuco (PE)', 'Piauí (PI)', 'Rio Grande do Norte (RN)', 'Sergipe (SE)'],
+    'Norte': ['Acre (AC)', 'Amapá (AP)', 'Amazonas (AM)', 'Pará (PA)', 'Rondônia (RO)', 'Roraima (RR)', 'Tocantins (TO)'],
+    'Sudeste': ['Espírito Santo (ES)', 'Minas Gerais (MG)', 'Rio de Janeiro (RJ)', 'São Paulo (SP)'],
+    'Sul': ['Paraná (PR)', 'Rio Grande do Sul (RS)', 'Santa Catarina (SC)'],
+    'Brasil': []  # Vazio para selecionar todos os estados
+}
+
 # Carregar os dados
 data = load_data()
 
-# Filtro INICIAL por Estado (PERG.6), ordenado alfabeticamente
-selected_perg_6 = st.sidebar.multiselect(
-    'Selecione o Estado:', 
-    sorted(data['PERG.6'].unique())  # Ordenando os estados em ordem alfabética
+# Filtro por Região do Brasil
+selected_regiao = st.sidebar.selectbox(
+    'Selecione a Região:', 
+    ['Brasil', 'Centro-Oeste', 'Nordeste', 'Norte', 'Sudeste', 'Sul']
 )
 
+# Atualizar o filtro de Estados com base na região selecionada
+if selected_regiao == 'Brasil':
+    estados_opcoes = sorted(data['PERG.6'].unique())  # Se 'Brasil' for selecionado, mostra todos os estados
+else:
+    estados_opcoes = regioes_estados[selected_regiao]
+
+selected_estado = st.sidebar.multiselect(
+    'Selecione o Estado:', 
+    estados_opcoes,
+    default=estados_opcoes  # Opcional: selecionar todos os estados da região por padrão
+)
+
+# Filtrar dados com base no estado selecionado
+if selected_estado:
+    filtered_data_by_estado = data[data['PERG.6'].isin(selected_estado)]
+else:
+    filtered_data_by_estado = pd.DataFrame(columns=data.columns)  # DataFrame vazio se nenhum estado for selecionado
+
+# Continue com o restante do seu código para filtragem por Interior ou Capital e visualizações...
+
+
 # Filtrar dados com base no estado selecionado para a próxima escolha
-if selected_perg_6:
-    filtered_data_by_perg_6 = data[data['PERG.6'].isin(selected_perg_6)]
+if selected_estado:
+    filtered_data_by_perg_6 = data[data['PERG.6'].isin(selected_estado)]
     
     # Filtro por Interior ou Capital (PERG.7) usando st.radio
     # Incluindo 'Ambos' como uma opção para permitir seleção de todos os dados
@@ -157,3 +188,5 @@ if not final_filtered_data.empty:
     plot_donut_chart_perg9(final_filtered_data)
 else:
     st.write("Selecione os filtros para visualizar os dados.")
+
+
