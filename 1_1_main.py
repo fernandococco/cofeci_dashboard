@@ -134,22 +134,26 @@ regioes_estados = {
 # Carregar os dados
 data = load_data()
 
-# Filtro por Região do Brasil
+# Filtro por Região do Brasil, iniciando sem seleção
 selected_regiao = st.sidebar.selectbox(
     'Selecione a Região:', 
-    ['Brasil', 'Centro-Oeste', 'Nordeste', 'Norte', 'Sudeste', 'Sul']
+    ['Nenhum', 'Brasil', 'Centro-Oeste', 'Nordeste', 'Norte', 'Sudeste', 'Sul'],
+    index=0  # Isso faz com que "Selecione uma opção" seja a opção padrão
 )
 
-# Atualizar o filtro de Estados com base na região selecionada
-if selected_regiao == 'Brasil':
-    estados_opcoes = sorted(data['PERG.6'].unique())  # Se 'Brasil' for selecionado, mostra todos os estados
-else:
+# Determinar as opções de estado com base na região selecionada
+if selected_regiao in regioes_estados and selected_regiao != 'Brasil':
     estados_opcoes = regioes_estados[selected_regiao]
+elif selected_regiao == 'Brasil':
+    estados_opcoes = sorted(data['PERG.6'].unique())
+else:
+    estados_opcoes = []
 
+# Atualizar o filtro de Estados para incluir todos os estados da região selecionada por padrão
 selected_estado = st.sidebar.multiselect(
     'Selecione o Estado:', 
     estados_opcoes,
-    default=estados_opcoes  # Opcional: selecionar todos os estados da região por padrão
+    default=estados_opcoes  # Define todos os estados como selecionados por padrão quando uma região é escolhida
 )
 
 # Filtrar dados com base no estado selecionado
@@ -157,9 +161,6 @@ if selected_estado:
     filtered_data_by_estado = data[data['PERG.6'].isin(selected_estado)]
 else:
     filtered_data_by_estado = pd.DataFrame(columns=data.columns)  # DataFrame vazio se nenhum estado for selecionado
-
-# Continue com o restante do seu código para filtragem por Interior ou Capital e visualizações...
-
 
 # Filtrar dados com base no estado selecionado para a próxima escolha
 if selected_estado:
