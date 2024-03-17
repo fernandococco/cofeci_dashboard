@@ -119,6 +119,10 @@ if 'selected_perg_7' not in st.session_state:
 if 'selected_escolaridade' not in st.session_state:
     st.session_state['selected_escolaridade'] = 'Todos'
 
+if 'selected_sexo' not in st.session_state:
+    st.session_state['selected_sexo'] = ['Masculino', 'Feminino']
+
+
 # Filtro por Região do Brasil
 # Salvando a seleção anterior para detectar mudanças
 previous_regiao = st.session_state['selected_regiao']
@@ -184,8 +188,21 @@ if selected_regiao != 'Selecione uma opção':
         if st.session_state['selected_escolaridade']:
             filtered_data = filtered_data[filtered_data['PERG.16'].astype(str).isin(st.session_state['selected_escolaridade'])]
 
-            # Aqui vão as funções de plotagem ou exibição de dados
+        options_sexo = ['Masculino', 'Feminino']
+        selected_sexo = st.sidebar.multiselect(
+            "Selecione o sexo dos entrevistados:",
+            options=options_sexo,
+            default=st.session_state['selected_sexo']
+        )
+        st.session_state['selected_sexo'] = selected_sexo
+
+        # Aplicando o filtro de sexo, caso alguma opção tenha sido selecionada
+        if st.session_state['selected_sexo']:
+            filtered_data = filtered_data[filtered_data['PERG.9'].isin(st.session_state['selected_sexo'])]
+
+            # Aqui continuam as funções de plotagem ou exibição de dados que já estavam sendo utilizadas
             plot_bar_chart_perg5(filtered_data)
             plot_donut_chart_perg9(filtered_data)
+
 else:
     st.write("Selecione os filtros para visualizar os dados.")
