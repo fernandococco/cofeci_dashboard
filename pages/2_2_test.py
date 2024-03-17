@@ -190,7 +190,7 @@ if selected_regiao != 'Selecione uma opção':
 
         options_sexo = ['Masculino', 'Feminino']
         selected_sexo = st.sidebar.multiselect(
-            "Selecione o sexo dos entrevistados:",
+            "Selecione o Sexo dos Entrevistados:",
             options=options_sexo,
             default=st.session_state['selected_sexo']
         )
