@@ -33,61 +33,49 @@ if not check_password():
 def load_data():
     return pd.read_csv('cofeci.csv')
 
+col1, col_empty, col2 = st.columns([1, 2, 1])
+
+# Na primeira coluna, adicionar o logo do Cofeci
+with col1:
+    st.image('cofeci3.jpeg', width=100)  # Ajuste a largura conforme necessário
+
+# Na segunda coluna, adicionar o logo do Rei
+with col2:
+    st.image('125.1_LOGO REI-01.png', width=100)  # Ajuste a largura conforme necessário
+
+
+
 # Função para plotar o gráfico de barras
-def plot_bar_chart_perg5(data):
-    data['PERG.5'] = pd.to_numeric(data['PERG.5'], errors='coerce')
-    data_filtered = data[data['PERG.5'] >= 20]
-    
-    max_age = data_filtered['PERG.5'].max()
-    if pd.isna(max_age):
-        max_bin = 30
-    else:
-        max_bin = int(max_age) + 10 - (int(max_age) % 10)
-    
-    bins = range(20, max_bin + 10, 10)
-    labels = [f'{i} - {i + 9}' for i in bins[:-1]]
-    
-    data_filtered['Faixa Etária'] = pd.cut(data_filtered['PERG.5'], bins=bins, labels=labels, right=False)
-    
-    age_group_percentage = data_filtered['Faixa Etária'].value_counts(normalize=True).sort_index() * 100
-    age_group_percentage_df = age_group_percentage.reset_index()
-    age_group_percentage_df.columns = ['Faixa Etária', 'Porcentagem']
-
-    color_map = {
-        '20 - 29': '#07f49e',
-        '30 - 39': '#11cc99',
-        '40 - 49': '#1ba493',
-        '50 - 59': '#257c8e',
-        '60 - 69': '#2e5489',
-        '70 - 79': '#382c83',
-        '80 - 89': '#42047e',
-    }
-
-    fig = px.bar(age_group_percentage_df, x='Faixa Etária', y='Porcentagem', text='Porcentagem',
-                 title='Porcentagem de Idade dos Entrevistados por Faixa Etária',
-                 color='Faixa Etária', color_discrete_map=color_map)
-    
-    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
-    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
-                      yaxis_title="Porcentagem (%)", xaxis_title="Faixa Etária")
-    
-    st.plotly_chart(fig)
-
-# Função para plotar o gráfico de donut
-def plot_donut_chart_perg9(data):
-    values_df = data['PERG.9'].value_counts().reset_index()
+def plot_donut_chart_perg11(data):
+    values_df = data['PERG.11'].value_counts().reset_index()
     values_df.columns = ['Resposta', 'Quantidade']
     
+    # Definindo o mapa de cores
     color_map = {
-        'Masculino': '#1dbde6',
-        'Feminino': '#f1515e'
+        'Sim': '#1f77b4',  # Azul
+        'Não': '#d62728'   # Vermelho
     }
     
     fig = px.pie(values_df, values='Quantidade', names='Resposta', hole=0.4,
-                 title='Sexo dos Entrevistados',
+                 title='Você tem filhos?',
                  color='Resposta', color_discrete_map=color_map)
     
     fig.update_traces(textinfo='percent', insidetextfont=dict(color='white', size=14))
+    
+    st.plotly_chart(fig)
+
+
+def plot_donut_chart_perg12(data):
+    # Substituindo NaN por "Não possui filhos"
+    data_filled = data['PERG.12'].fillna('Não possui filhos')
+    
+    values_df = data_filled.value_counts().reset_index()
+    values_df.columns = ['Resposta', 'Quantidade']
+    
+    fig = px.pie(values_df, values='Quantidade', names='Resposta', hole=0.4,
+                 title='Quantos filhos você tem?')
+    
+    fig.update_traces(textinfo='percent+label', insidetextfont=dict(color='white', size=14))
     
     st.plotly_chart(fig)
 
@@ -201,8 +189,8 @@ if selected_regiao != 'Selecione uma opção':
             filtered_data = filtered_data[filtered_data['PERG.9'].isin(st.session_state['selected_sexo'])]
 
             # Aqui continuam as funções de plotagem ou exibição de dados que já estavam sendo utilizadas
-            plot_bar_chart_perg5(filtered_data)
-            plot_donut_chart_perg9(filtered_data)
+            plot_donut_chart_perg11(filtered_data)
+            plot_donut_chart_perg12(filtered_data)
 
 else:
     st.write("Selecione os filtros para visualizar os dados.")

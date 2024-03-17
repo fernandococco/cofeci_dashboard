@@ -33,6 +33,18 @@ if not check_password():
 def load_data():
     return pd.read_csv('cofeci.csv')
 
+col1, col_empty, col2 = st.columns([1, 2, 1])
+
+# Na primeira coluna, adicionar o logo do Cofeci
+with col1:
+    st.image('cofeci3.jpeg', width=100)  # Ajuste a largura conforme necessário
+
+# Na segunda coluna, adicionar o logo do Rei
+with col2:
+    st.image('125.1_LOGO REI-01.png', width=100)  # Ajuste a largura conforme necessário
+
+
+
 # Função para plotar o gráfico de barras
 def plot_bar_chart_perg5(data):
     data['PERG.5'] = pd.to_numeric(data['PERG.5'], errors='coerce')
@@ -74,22 +86,17 @@ def plot_bar_chart_perg5(data):
     st.plotly_chart(fig)
 
 # Função para plotar o gráfico de donut
-def plot_donut_chart_perg9(data):
-    values_df = data['PERG.9'].value_counts().reset_index()
+def plot_donut_chart_perg10(data):
+    values_df = data['PERG.10'].value_counts().reset_index()
     values_df.columns = ['Resposta', 'Quantidade']
     
-    color_map = {
-        'Masculino': '#1dbde6',
-        'Feminino': '#f1515e'
-    }
-    
     fig = px.pie(values_df, values='Quantidade', names='Resposta', hole=0.4,
-                 title='Sexo dos Entrevistados',
-                 color='Resposta', color_discrete_map=color_map)
+                 title='Estado Civil dos Entrevistados')
     
     fig.update_traces(textinfo='percent', insidetextfont=dict(color='white', size=14))
     
     st.plotly_chart(fig)
+
 
 # Carregar os dados
 
@@ -202,7 +209,7 @@ if selected_regiao != 'Selecione uma opção':
 
             # Aqui continuam as funções de plotagem ou exibição de dados que já estavam sendo utilizadas
             plot_bar_chart_perg5(filtered_data)
-            plot_donut_chart_perg9(filtered_data)
+            plot_donut_chart_perg10(filtered_data)
 
 else:
     st.write("Selecione os filtros para visualizar os dados.")
