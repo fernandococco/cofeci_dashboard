@@ -46,42 +46,85 @@ with col2:
 
 
 # Função para plotar o gráfico de barras
-def plot_donut_chart_perg11(data):
-    values_df = data['PERG.11'].value_counts().reset_index()
-    values_df.columns = ['Resposta', 'Quantidade']
+def plot_bar_chart_perg13(df):
+    # Normalizando categorias específicas para "Negro"
+    df['PERG.13'] = df['PERG.13'].replace({
+        "Negro": "Negro",
+        "Africano": "Negro",
+        "Preto": "Negro",
+        "Amarelo": "Amarelo",
+        "AMARELO": "Amarelo"
+    })
+
+    # Consolidando categorias para "Não quis responder/Indiferente"
+    categorias_indiferente = [
+        "Não quis responder", "Não quis informar", "indiferente", "Indiferente", "Indiferente  ",
+        "INDIFERNTE", "Não respondeu", "NÃO QUIS RESPONDER.", "Não informa",
+        "não se identifica como nada", "Não se interessou em responder ao questionário",
+        "99", "Não quis informar"
+    ]
     
-    # Definindo o mapa de cores
-    color_map = {
-        'Sim': '#1f77b4',  # Azul
-        'Não': '#d62728'   # Vermelho
-    }
+    df['PERG.13'] = df['PERG.13'].apply(lambda x: "Não quis responder/Indiferente" if x in categorias_indiferente else x)
+
+    # Filtrando o DataFrame para manter somente as categorias desejadas
+    categorias_desejadas = ["Branco", "Pardo", "Negro", "Não quis responder/Indiferente"]
+    df_filtrado = df[df['PERG.13'].isin(categorias_desejadas)]
+
+    # Contando a ocorrência das categorias normalizadas e convertendo para porcentagem
+    df_agrupado = df_filtrado['PERG.13'].value_counts(normalize=True).reset_index()
+    df_agrupado.columns = ['Resposta', 'Porcentagem']
+    df_agrupado['Porcentagem'] *= 100
+
+    # Cores especificadas
+    cores = ['#05668d', '#028090', '#00a896', '#02c39a', '#ff9e00', '#00b4d8', '#0096c7', '#0077b6', '#023e8a', '#03045e']
+
+    # Criando o gráfico de barras
+    fig = px.bar(df_agrupado, x='Resposta', y='Porcentagem', title='Qual a sua etnia?',
+                 text='Porcentagem', color='Resposta', color_discrete_sequence=cores)
     
-    fig = px.pie(values_df, values='Quantidade', names='Resposta', hole=0.4,
-                 title='Você tem filhos?',
-                 color='Resposta', color_discrete_map=color_map)
+    # Ajustes finais no gráfico
+    fig.update_traces(texttemplate='%{text:.2s}%')
+    fig.update_layout(xaxis_title="Categoria", yaxis_title="Porcentagem (%)", xaxis={'categoryorder':'total descending'})
     
-    fig.update_traces(textinfo='percent', insidetextfont=dict(color='white', size=14))
-    # Ajustando a posição da legenda para a parte inferior
-    fig.update_layout(legend=dict(orientation="h", y=-0.2, x=0.5, xanchor='center', yanchor='top'))
-    
-    st.plotly_chart(fig)
+    # Exibindo o gráfico
+    st.plotly_chart(fig) 
 
 
-def plot_donut_chart_perg12(data):
-    # Substituindo NaN por "Não possui filhos"
-    data_filled = data['PERG.12'].fillna('Não possui filhos')
+def plot_bar_chart_perg14(df):
+    # Profissões especificadas na lista fornecida
+    profissoes_listadas = [
+        "Não tem outra profissão",
+        "Administrador(a)",
+        "Advogado(a)",
+        "Empresário(a)",
+        "Funcionário público",
+        "Aposentado",
+        "Comerciante",
+        "Engenheiro(a)",
+        "Professor(a)"
+    ]
     
-    values_df = data_filled.value_counts().reset_index()
-    values_df.columns = ['Resposta', 'Quantidade']
-    
-    fig = px.pie(values_df, values='Quantidade', names='Resposta', hole=0.4,
-                 title='Quantos filhos você tem?')
-    
-    fig.update_traces(textinfo='percent+label', insidetextfont=dict(color='white', size=14))
-    
-    # Ajustando a posição da legenda para a parte inferior
-    fig.update_layout(legend=dict(orientation="h", y=-0.2, x=0.5, xanchor='center', yanchor='top'))
-    
+    # Cria uma nova coluna 'Categoria' no DataFrame
+    df['Categoria'] = df['PERG.14'].apply(lambda x: x if x in profissoes_listadas else "Outros")
+
+    # Contagem de quantidades por categoria
+    df_agrupado = df['Categoria'].value_counts(normalize=True).reset_index()
+    df_agrupado.columns = ['Resposta', 'Porcentagem']
+
+    # Convertendo a porcentagem para o formato de porcentagem no gráfico
+    df_agrupado['Porcentagem'] *= 100
+
+    # Cores da imagem enviada
+    cores = ["#f94144", "#f3722c", "#f8961e", "#f9844a", "#f9c74f", "#90be6d", "#43aa8b", "#4d908e", "#577590", "#277da1"]
+
+    # Criando o gráfico de barras com as cores especificadas
+    fig = px.bar(df_agrupado, x='Resposta', y='Porcentagem', title='Possui outra profissão além de corretor?',
+                 text='Porcentagem', color='Resposta', color_discrete_sequence=cores)
+
+    # Ajustes finais no gráfico
+    fig.update_layout(xaxis_title="Profissão", yaxis_title="Porcentagem (%)", xaxis={'categoryorder':'total descending'})
+    fig.update_traces(texttemplate='%{text:.2f}%')
+
     st.plotly_chart(fig)
 # Carregar os dados
 
@@ -193,8 +236,8 @@ if selected_regiao != 'Selecione uma opção':
             filtered_data = filtered_data[filtered_data['PERG.9'].isin(st.session_state['selected_sexo'])]
 
             # Aqui continuam as funções de plotagem ou exibição de dados que já estavam sendo utilizadas
-            plot_donut_chart_perg11(filtered_data)
-            plot_donut_chart_perg12(filtered_data)
+            plot_bar_chart_perg13(filtered_data)
+            plot_bar_chart_perg14(filtered_data)
 
 else:
     st.write("Selecione os filtros para visualizar os dados.")
