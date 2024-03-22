@@ -86,6 +86,13 @@ def plot_bar_chart_perg46(df):
 
 data = load_data()
 
+data['PERG.5'] = data['PERG.5'].astype(str)
+data['PERG.5'] = data['PERG.5'].str.extract('(\d+)')[0]  # Extrai apenas os dígitos
+data = data[~data['PERG.5'].isnull()]  # Remove linhas onde a idade não pôde ser extraída
+data['PERG.5'] = data['PERG.5'].astype(int)  # Converte para inteiro
+data = data[(data['PERG.5'] > 0) & (data['PERG.5'] <= 120)]  # Filtra idades razoáveis
+
+
 # Mapeamento de Regiões para Estados
 regioes_estados = {
     'Centro-Oeste': ['Goiás (GO)', 'Mato Grosso (MT)', 'Mato Grosso do Sul (MS)', 'Distrito Federal (DF)'],
@@ -162,6 +169,26 @@ if selected_regiao != 'Selecione uma opção':
         if st.session_state['selected_perg_7'] != 'Ambos':
             filtered_data = filtered_data[filtered_data['PERG.7'] == st.session_state['selected_perg_7']]
 
+        data['PERG.5'] = data['PERG.5'].astype(int)
+
+        # Adicionando o filtro de idade como antes
+        options_idade = ['Todos', 'Menos de 35 anos', 'Mais de 35 anos']
+        if 'selected_idade' not in st.session_state:
+            st.session_state['selected_idade'] = 'Todos'
+
+        selected_idade = st.sidebar.selectbox(
+            "Selecione a Faixa Etária:",
+            options=options_idade,
+            index=options_idade.index(st.session_state['selected_idade'])
+        )
+        st.session_state['selected_idade'] = selected_idade
+
+        # Aplicando o filtro de idade ao DataFrame
+        if selected_idade == 'Menos de 35 anos':
+            filtered_data = filtered_data[filtered_data['PERG.5'] < 35]
+        elif selected_idade == 'Mais de 35 anos':
+            filtered_data = filtered_data[filtered_data['PERG.5'] > 35]
+
         # Atualizando o filtro de escolaridade para multiselect e removendo a opção 'Todos'
         escolaridade_opcoes = sorted(filtered_data['PERG.16'].dropna().astype(str).unique().tolist())
         # Garantindo que os valores padrão estejam nas opções disponíveis
@@ -190,7 +217,7 @@ if selected_regiao != 'Selecione uma opção':
         # Aplicando o filtro de sexo, caso alguma opção tenha sido selecionada
         if st.session_state['selected_sexo']:
             filtered_data = filtered_data[filtered_data['PERG.9'].isin(st.session_state['selected_sexo'])]
-
+            
             # Aqui continuam as funções de plotagem ou exibição de dados que já estavam sendo utilizadas
             plot_bar_chart_perg46(filtered_data)
 
