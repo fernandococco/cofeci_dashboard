@@ -1,0 +1,198 @@
+import pandas as pd
+import plotly.graph_objects as go
+import plotly.express as px
+import streamlit as st
+import hmac
+from PIL import Image
+from collections import Counter
+
+# Função para verificar a senha
+def check_password():
+    def password_entered():
+        if hmac.compare_digest(st.session_state["password"], st.secrets["password"]):
+            st.session_state["password_correct"] = True
+            del st.session_state["password"]
+        else:
+            st.session_state["password_correct"] = False
+
+    if st.session_state.get("password_correct", False):
+        return True
+
+    password = st.text_input("Senha: ", type="password", key="password")
+    st.button("Enviar Senha", on_click=password_entered)
+
+    if "password_correct" in st.session_state:
+        st.error("Senha Incorreta.")
+
+    return False
+
+if not check_password():
+    st.stop()
+
+# Função para carregar os dados
+@st.cache_data
+def load_data():
+    return pd.read_csv('cofeci2.csv')
+
+col1, col_empty, col2 = st.columns([1, 2, 1])
+
+# Na primeira coluna, adicionar o logo do Cofeci
+with col1:
+    st.image('cofeci3.jpeg', width=100)  # Ajuste a largura conforme necessário
+
+# Na segunda coluna, adicionar o logo do Rei
+with col2:
+    st.image('125.1_LOGO REI-01.png', width=100)  # Ajuste a largura conforme necessário
+
+
+# Função para plotar o gráfico de barras
+### rosca simples
+
+def plot_bar_chart_perg46(df):
+    # Definindo o mapa de cores
+    cores = ["#f94144", "#f3722c", "#f8961e", "#f9844a", "#f9c74f", 
+             "#90be6d", "#43aa8b", "#4d908e", "#577590", "#277da1"]
+    
+    # Categorias de renda após substituir "k" por " mil"
+    income_categories = {
+        'Não informou': 'Não informou',
+        'De 3k a 5k': 'De 3 mil a 5 mil',
+        'De 5k a 7k': 'De 5 mil a 7 mil',
+        'De 7k a 10k': 'De 7 mil a 10 mil',
+        'Até 3k': 'Até 3 mil',
+        'de 10k a 15k': 'De 10 mil a 15 mil',
+        'De 20k em diante': 'De 20 mil em diante',
+        'De 15k a 20k': 'De 15 mil a 20 mil'
+    }
+    df['PERG.46'] = df['PERG.46'].map(income_categories)
+    
+    # Calculando a porcentagem de cada categoria
+    category_counts = df['PERG.46'].value_counts(normalize=True) * 100
+    
+    # Preparando o mapeamento de cores para cada categoria
+    color_map = {category: cores[i % len(cores)] for i, category in enumerate(category_counts.index)}
+    
+    # Gerando o gráfico de barras
+    fig = px.bar(category_counts, 
+                 x=category_counts.index, 
+                 y=category_counts.values, 
+                 labels={'x': 'Categoria de Renda', 'y': 'Porcentagem (%)'}, 
+                 title='Porcentagem de Respostas por Categoria de Renda',
+                 color=category_counts.index,  # Define a cor baseada na categoria
+                 color_discrete_map=color_map)  # Aplica o mapeamento de cores
+    
+    st.plotly_chart(fig)
+
+
+data = load_data()
+
+# Mapeamento de Regiões para Estados
+regioes_estados = {
+    'Centro-Oeste': ['Goiás (GO)', 'Mato Grosso (MT)', 'Mato Grosso do Sul (MS)', 'Distrito Federal (DF)'],
+    'Nordeste': ['Alagoas (AL)', 'Bahia (BA)', 'Ceará (CE)', 'Maranhão (MA)', 'Paraíba (PB)', 'Pernambuco (PE)', 'Piauí (PI)', 'Rio Grande do Norte (RN)', 'Sergipe (SE)'],
+    'Norte': ['Acre (AC)', 'Amapá (AP)', 'Amazonas (AM)', 'Pará (PA)', 'Rondônia (RO)', 'Roraima (RR)', 'Tocantins (TO)'],
+    'Sudeste': ['Espírito Santo (ES)', 'Minas Gerais (MG)', 'Rio de Janeiro (RJ)', 'São Paulo (SP)'],
+    'Sul': ['Paraná (PR)', 'Rio Grande do Sul (RS)', 'Santa Catarina (SC)'],
+    'Brasil': []  
+}
+if 'password_correct' not in st.session_state:
+    st.session_state['password_correct'] = False
+
+if 'selected_regiao' not in st.session_state:
+    st.session_state['selected_regiao'] = 'Selecione uma opção'
+
+if 'selected_estado' not in st.session_state:
+    st.session_state['selected_estado'] = []
+
+if 'selected_perg_7' not in st.session_state:
+    st.session_state['selected_perg_7'] = 'Ambos'
+
+if 'selected_escolaridade' not in st.session_state:
+    st.session_state['selected_escolaridade'] = 'Todos'
+
+if 'selected_sexo' not in st.session_state:
+    st.session_state['selected_sexo'] = ['Masculino', 'Feminino']
+
+
+# Filtro por Região do Brasil
+# Salvando a seleção anterior para detectar mudanças
+previous_regiao = st.session_state['selected_regiao']
+selected_regiao = st.sidebar.selectbox(
+    'Selecione a Região:', 
+    ['Selecione uma opção', 'Brasil', 'Centro-Oeste', 'Nordeste', 'Norte', 'Sudeste', 'Sul'],
+    index=['Selecione uma opção', 'Brasil', 'Centro-Oeste', 'Nordeste', 'Norte', 'Sudeste', 'Sul'].index(st.session_state['selected_regiao'])
+)
+st.session_state['selected_regiao'] = selected_regiao
+
+# Atualizar o filtro de Estados com base na região selecionada
+estados_opcoes = []
+if selected_regiao != 'Selecione uma opção':
+    # Determinando as opções de estado com base na região selecionada
+    if selected_regiao == 'Brasil':
+        estados_opcoes = sorted(data['PERG.6'].unique())
+    else:
+        estados_opcoes = regioes_estados[selected_regiao]
+
+    # Atualizando os estados selecionados para todos da nova região se a região mudou
+    if selected_regiao != previous_regiao:
+        st.session_state['selected_estado'] = estados_opcoes
+
+    # Permitindo ao usuário fazer uma seleção manual dos estados
+    selected_estado = st.sidebar.multiselect(
+        'Selecione o Estado:',
+        estados_opcoes,
+        default=st.session_state['selected_estado']
+    )
+    if selected_estado:
+        st.session_state['selected_estado'] = selected_estado
+
+    # Aplicando o filtro de estado
+    if st.session_state['selected_estado']:
+        filtered_data = data[data['PERG.6'].isin(st.session_state['selected_estado'])]
+
+        # Filtro de interior/capital
+        options_perg_7 = ['Ambos', 'Capital', 'Interior']
+        selected_perg_7 = st.sidebar.radio(
+            "Selecione Interior ou Capital:",
+            options=options_perg_7,
+            index=options_perg_7.index(st.session_state['selected_perg_7'])
+        )
+        st.session_state['selected_perg_7'] = selected_perg_7
+
+        if st.session_state['selected_perg_7'] != 'Ambos':
+            filtered_data = filtered_data[filtered_data['PERG.7'] == st.session_state['selected_perg_7']]
+
+        # Atualizando o filtro de escolaridade para multiselect e removendo a opção 'Todos'
+        escolaridade_opcoes = sorted(filtered_data['PERG.16'].dropna().astype(str).unique().tolist())
+        # Garantindo que os valores padrão estejam nas opções disponíveis
+        if not set(st.session_state['selected_escolaridade']).issubset(set(escolaridade_opcoes)):
+            st.session_state['selected_escolaridade'] = escolaridade_opcoes
+
+        selected_escolaridade = st.sidebar.multiselect(
+            "Selecione a Escolaridade:",
+            escolaridade_opcoes,
+            default=st.session_state['selected_escolaridade']
+        )
+        st.session_state['selected_escolaridade'] = selected_escolaridade
+
+        # Aplicando o filtro de escolaridade
+        if st.session_state['selected_escolaridade']:
+            filtered_data = filtered_data[filtered_data['PERG.16'].astype(str).isin(st.session_state['selected_escolaridade'])]
+
+        options_sexo = ['Masculino', 'Feminino']
+        selected_sexo = st.sidebar.multiselect(
+            "Selecione o Sexo dos Entrevistados:",
+            options=options_sexo,
+            default=st.session_state['selected_sexo']
+        )
+        st.session_state['selected_sexo'] = selected_sexo
+
+        # Aplicando o filtro de sexo, caso alguma opção tenha sido selecionada
+        if st.session_state['selected_sexo']:
+            filtered_data = filtered_data[filtered_data['PERG.9'].isin(st.session_state['selected_sexo'])]
+
+            # Aqui continuam as funções de plotagem ou exibição de dados que já estavam sendo utilizadas
+            plot_bar_chart_perg46(filtered_data)
+
+else:
+    st.write("Selecione os filtros para visualizar os dados.")
