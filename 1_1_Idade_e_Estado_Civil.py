@@ -81,8 +81,19 @@ def plot_bar_chart_perg5(data):
     
     fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
     fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
-                      yaxis_title="Porcentagem (%)", xaxis_title="Faixa Etária")
-    
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                        tickmode='array',
+                        tickvals=[]
+                        ))
     st.plotly_chart(fig)
 
 # Função para plotar o gráfico de donut
@@ -94,7 +105,14 @@ def plot_donut_chart_perg10(data):
                  title='Estado Civil dos Entrevistados')
     
     fig.update_traces(textinfo='percent', insidetextfont=dict(color='white', size=14))
-    
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ))
     st.plotly_chart(fig)
 
 

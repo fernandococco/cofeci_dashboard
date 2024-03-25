@@ -77,7 +77,7 @@ def plot_donut_chart_perg12(data):
     fig = px.pie(values_df, values='Quantidade', names='Resposta', hole=0.4,
                  title='Quantos filhos você tem?')
     
-    fig.update_traces(textinfo='percent+label', insidetextfont=dict(color='white', size=14))
+    fig.update_traces(textinfo='percent', insidetextfont=dict(color='white', size=14))
     
     # Ajustando a posição da legenda para a parte inferior
     fig.update_layout(legend=dict(orientation="h", y=-0.2, x=0.5, xanchor='center', yanchor='top'))

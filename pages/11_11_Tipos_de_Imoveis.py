@@ -63,11 +63,26 @@ def plot_bar_chart_perg32(df):
     df_porcentagens.sort_values('Porcentagem', ascending=False, inplace=True)
 
     # Gerar o gráfico de barras com porcentagens
-    fig = px.bar(df_porcentagens, x='Resposta', y='Porcentagem', 
+    fig = px.bar(df_porcentagens, x='Resposta', y='Porcentagem', text='Porcentagem', 
                  title='Seu principal foco é:', 
                  color='Resposta',
                  labels={'Porcentagem': 'Porcentagem (%)', 'Resposta': 'Resposta'})
-
+    
+    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                        tickmode='array',
+                        tickvals=[]
+                        ))
     st.plotly_chart(fig)
     
 def plot_bar_chart_perg33(df):
@@ -100,9 +115,25 @@ def plot_bar_chart_perg33(df):
 
     # Gerar o gráfico de barras
     fig = px.bar(df_porcentagens, x='Categoria', y='Porcentagem', 
-                 title='Tipo de Imóvel que costuma trabalhar', 
+                 title='Tipo de Imóvel que costuma trabalhar', text='Porcentagem',
                  color='Categoria',
                  labels={'Porcentagem': 'Porcentagem (%)', 'Categoria': 'Categoria'})
+    
+    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                        tickmode='array',
+                        tickvals=[]
+                        ))
                 
     st.plotly_chart(fig)
 

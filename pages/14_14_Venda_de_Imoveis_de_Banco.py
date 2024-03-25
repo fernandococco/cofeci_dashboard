@@ -63,8 +63,16 @@ def plot_bar_chart_perg38(df):
                  title='Você já atuou em venda de imóveis de bancos?', 
                  hole=0.4)  # hole=0.4 cria o efeito de rosca
     
-    fig.update_traces(textinfo='percent+label')
+    fig.update_traces(textinfo='percent')
     fig.update_layout(colorway=['#f1515e','#1dbde6'])  # Adicionando o color map
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ))
     st.plotly_chart(fig)
     
 def plot_bar_chart_perg39(df):
@@ -81,8 +89,15 @@ def plot_bar_chart_perg39(df):
                  title='Gostaria de atuar em venda de imóveis de banco?', 
                  hole=0.4)  # hole=0.4 cria o efeito de rosca
     
-    fig.update_traces(textinfo='percent+label')
-    fig.update_layout(showlegend=False)  # Removendo a legenda
+    fig.update_traces(textinfo='percent')
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ))
     
     st.plotly_chart(fig)
 

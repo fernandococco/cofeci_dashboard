@@ -59,8 +59,16 @@ def plot_bar_chart_perg64(df):
                  title='Você sempre sonhou em ser um corretor de imóveis?', 
                  hole=0.4)  # hole=0.4 cria o efeito de rosca
     
-    fig.update_traces(textinfo='percent+label')
+    fig.update_traces(textinfo='percent')
     fig.update_layout(colorway=['#f1515e','#1dbde6'])  # Adicionando o color map
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ))
     st.plotly_chart(fig)
 
 def plot_bar_chart_perg65(df):
@@ -77,8 +85,16 @@ def plot_bar_chart_perg65(df):
                  title='Você tem orgulho em ser um corretor de imóveis?', 
                  hole=0.4)  # hole=0.4 cria o efeito de rosca
     
-    fig.update_traces(textinfo='percent+label')
+    fig.update_traces(textinfo='percent')
     fig.update_layout(colorway=['#1dbde6','#f1515e'])  # Adicionando o color map
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ))
     st.plotly_chart(fig)
 
 
@@ -118,6 +134,7 @@ def plot_bar_chart_perg67(df):
     fig = px.bar(df_porcentagens, x='Categoria', y='Porcentagem', 
                  title='Por que você se tornou um corretor de imóveis?', 
                  color='Categoria',
+                 text = 'Porcentagem',
                  color_discrete_map={"Porque é uma oportunidade de ganhar muito dinheiro": "#0ad2ff", 
                                      "Porque minha família é do ramo": "#2962ff", 
                                      "Começou a gostar da área.": "#9500ff", 
@@ -125,7 +142,21 @@ def plot_bar_chart_perg67(df):
                                      'Acaso': "#ff8c00",
                                      "Outros Motivos": "#0fffdb"},
                  labels={'Porcentagem': 'Porcentagem (%)', 'Categoria': 'Categoria'})
-                
+    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                        tickmode='array',
+                        tickvals=[]
+                        ))
     st.plotly_chart(fig)
 
 

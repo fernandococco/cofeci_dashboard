@@ -76,12 +76,27 @@ def plot_bar_chart_perg61(df):
     # Gerar o gráfico de barras
     fig = px.bar(df_porcentagens, x='Categoria', y='Porcentagem', 
                  title='Em quais portais você possui anúncios?', 
-                 color='Categoria',
+                 color='Categoria', text = 'Porcentagem',
                  color_discrete_map={"OLX": "#0ad2ff", "ZAP": "#2962ff", "Viva Real": "#9500ff", 
                                      "Casa Mineira": "#b4e600", "Não faz anúncios": "#ff0059", 
                                      "Outros": "#0fffdb"},
                  labels={'Porcentagem': 'Porcentagem (%)', 'Categoria': 'Categoria'})
                 
+    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                        tickmode='array',
+                        tickvals=[]
+                        ))
     st.plotly_chart(fig)
 
 def plot_bar_chart_perg63(df):
@@ -113,13 +128,28 @@ def plot_bar_chart_perg63(df):
     df_porcentagens = pd.DataFrame(list(porcentagens_ordenadas.items()), columns=['Categoria', 'Porcentagem'])
 
     # Gerar o gráfico de barras
-    fig = px.bar(df_porcentagens, x='Categoria', y='Porcentagem', 
+    fig = px.bar(df_porcentagens, x='Categoria', y='Porcentagem', text='Porcentagem',
                  title='Qual seu portal de anúncios favorito?', 
                  color='Categoria',
                  color_discrete_map={"OLX": "#0ad2ff", "ZAP": "#2962ff", "Viva Real": "#9500ff", 
                                      "Casa Mineira": "#b4e600", "Não faz anúncios": "#ff0059", 
                                      'Instagram': "#ff8c00", "Outros": "#0fffdb"},
                  labels={'Porcentagem': 'Porcentagem (%)', 'Categoria': 'Categoria'})
+    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                        tickmode='array',
+                        tickvals=[]
+                        ))
                 
     st.plotly_chart(fig)
 

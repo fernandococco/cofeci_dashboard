@@ -64,10 +64,25 @@ def plot_bar_chart_perg30(df):
 
     # Gerar o gráfico de barras com porcentagens
     fig = px.bar(df_porcentagens, x='Resposta', y='Porcentagem', 
-                 title='Você costuma vender mais para...? (em porcentagem)', 
-                 color='Resposta',
+                 title='Você costuma vender mais para...?', 
+                 color='Resposta',text='Porcentagem',
                  labels={'Porcentagem': 'Porcentagem (%)', 'Resposta': 'Resposta'})
-
+    
+    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                        tickmode='array',
+                        tickvals=[]
+                        ))
     st.plotly_chart(fig)
 
 
@@ -85,7 +100,16 @@ def plot_bar_chart_perg31(df):
                  title='Você costuma ter contato com investidores estrangeiros?', 
                  hole=0.4)  # hole=0.4 cria o efeito de rosca
     
-    fig.update_traces(textinfo='percent+label')
+    fig.update_traces(textinfo='percent')
+    fig.update_layout(colorway=['#f1515e','#1dbde6'])  # Adicionando o color map
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ))
     st.plotly_chart(fig)
 
     

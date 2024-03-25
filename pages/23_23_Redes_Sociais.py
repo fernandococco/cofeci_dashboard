@@ -48,7 +48,16 @@ with col2:
 def plot_bar_chart_perg60(df):
     coluna = "PERG.60"
     categorias_especificas = ["Instagram", "Facebook", "Google", "Linkedin", "Tiktok", "Não"]
-    
+    dic_color = {  # As cores podem ser ajustadas conforme necessário
+        'Instagram': '#E1306C',
+        'Facebook': '#3b5998',
+        'Google': '#DB4437',
+        'Linkedin': '#0077B5',
+        'Tiktok': '#69C9D0',
+        'Não': '#656565',
+        'Outros': '#B2B1B9'
+    }
+
     contador = Counter()
     total_respondentes = len(df)  # Total de linhas no dataframe
     
@@ -77,8 +86,27 @@ def plot_bar_chart_perg60(df):
     fig = px.bar(df_porcentagens, x='Categoria', y='Porcentagem', 
                  title='Em quais das ferramentas abaixo você está presente profissionalmente?', 
                  color='Categoria',
+                 color_discrete_map=dic_color, text='Porcentagem',
                  labels={'Porcentagem': 'Porcentagem (%)', 'Categoria': 'Categoria'})
-                
+
+    # Atualiza o formato do texto de porcentagem sobre as barras para ter duas casas decimais
+    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+
+    # Atualiza o layout para remover os rótulos do eixo x e ajustar a legenda
+    fig.update_layout(
+        yaxis_title="Porcentagem (%)",
+        xaxis=dict(
+            showticklabels=False  # Remove os rótulos do eixo x
+        ),
+        legend=dict(
+            title=None,  # Remove o título da legenda, se houver
+            orientation="h",
+            yanchor="bottom",
+            y=-0.3,  # Ajuste conforme necessário
+            xanchor="center",
+            x=0.5
+        )
+    )
     st.plotly_chart(fig)
 
 data = load_data()

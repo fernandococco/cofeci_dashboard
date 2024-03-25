@@ -64,8 +64,20 @@ def plot_bar_chart_perg23_24(df):
     
     # Ajustes finais no gráfico
     fig.update_traces(texttemplate='%{text:.2f}%')
-    fig.update_layout(xaxis_title="Categoria", yaxis_title="Porcentagem (%)", xaxis={'categoryorder':'total descending'})
-    
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                        tickmode='array',
+                        tickvals=[]
+                        ))
     st.plotly_chart(fig)
 
 def plot_donut_chart_perg25(data):
@@ -76,7 +88,14 @@ def plot_donut_chart_perg25(data):
                  title='Quantos imóveis você possui, além do que mora?')
     
     fig.update_traces(textinfo='percent', insidetextfont=dict(color='white', size=14))
-    
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ))
     st.plotly_chart(fig)
 
 data = load_data()

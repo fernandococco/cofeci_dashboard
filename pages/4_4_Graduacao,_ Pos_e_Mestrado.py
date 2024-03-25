@@ -86,7 +86,7 @@ def plot_bar_chart_perg17(df):
     df_agrupado['Porcentagem'] *= 100
     
     # Cores para o gráfico
-    cores = ['#FFA07A', '#20B2AA', '#778899', '#9370DB', '#3CB371', '#FFD700']
+    cores = ['#FFA07A', '#20B2AA', '#778899', '#9370DB', '#3CB371', '#FFD700','#4361ee']
 
     # Criando o gráfico de barras
     fig = px.bar(df_agrupado, x='Categoria', y='Porcentagem', title='Áreas de Formação',
@@ -94,8 +94,20 @@ def plot_bar_chart_perg17(df):
 
     # Ajustes finais no gráfico
     fig.update_traces(texttemplate='%{text:.2s}%')
-    fig.update_layout(xaxis_title="Área de Formação", yaxis_title="Porcentagem (%)", xaxis={'categoryorder':'total descending'})
-    
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                        tickmode='array',
+                        tickvals=[]
+                        ))
     st.plotly_chart(fig)
 
 
@@ -166,6 +178,20 @@ def plot_bar_chart_perg19(df, column):
     
     # Customize the text on the bars
     fig.update_traces(texttemplate='%{text:.2f}%')
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                        tickmode='array',
+                        tickvals=[]
+                        ))
     # Show the figure
     st.plotly_chart(fig)
 
@@ -219,11 +245,20 @@ def plot_bar_chart_perg21(df, column):
     )
     
     # Customize the layout
-    fig.update_layout(
-        xaxis_title='Categoria',
-        yaxis_title='Porcentagem (%)',
-        showlegend=True
-    )
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                        tickmode='array',
+                        tickvals=[]
+                        ))
     
     # Customize the text on the bars
     fig.update_traces(texttemplate='%{text:.2f}%')

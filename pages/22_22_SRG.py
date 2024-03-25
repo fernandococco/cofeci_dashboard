@@ -60,8 +60,16 @@ def plot_bar_chart_perg57(df):
                  title='Você sabe o que é o SGR e como funciona?', 
                  hole=0.4)  # hole=0.4 cria o efeito de rosca
     
-    fig.update_traces(textinfo='percent+label')
+    fig.update_traces(textinfo='percent')
     fig.update_layout(colorway=['#f1515e','#1dbde6'])  # Adicionando o color map
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ))
     st.plotly_chart(fig)
 
 def plot_bar_chart_perg58(df):
@@ -78,8 +86,16 @@ def plot_bar_chart_perg58(df):
                  title='Você já acessou ao SGR?', 
                  hole=0.4)  # hole=0.4 cria o efeito de rosca
     
-    fig.update_traces(textinfo='percent+label')
+    fig.update_traces(textinfo='percent')
     fig.update_layout(colorway=['#f1515e','#1dbde6'])  # Adicionando o color map
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ))
     st.plotly_chart(fig)
 
 def plot_bar_chart_perg59(df):
@@ -94,15 +110,38 @@ def plot_bar_chart_perg59(df):
     
     # Calculando a porcentagem de cada categoria
     category_counts = df['PERG.59'].value_counts(normalize=True) * 100
+    category_percentages_df = category_counts.reset_index()
+    category_percentages_df.columns = ['Resposta', 'Porcentagem (%)']
     
     # Gerando o gráfico de barras
-    fig = px.bar(category_counts, 
-                 x=category_counts.index, 
-                 y=category_counts.values, 
-                 labels={'x': 'Resposta', 'y': 'Porcentagem (%)'}, 
+    fig = px.bar(category_percentages_df, 
+                 x='Resposta', 
+                 y='Porcentagem (%)', 
                  title='O que você pensa sobre o que o SGR pode oferecer a você?',
-                 color=category_counts.index,  # Define a cor baseada na categoria
+                 text='Porcentagem (%)',
+                 color='Resposta',  # Usa a coluna categórica para a cor
                  color_discrete_map=dic_color)  # Aplica o mapeamento de cores fornecido
+
+    # Atualiza o formato do texto de porcentagem sobre as barras para ter duas casas decimais
+    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+
+    # Atualiza o layout para remover os rótulos do eixo x e ajustar a legenda
+    fig.update_layout(
+        uniformtext_minsize=8, 
+        uniformtext_mode='hide',
+        yaxis_title="Porcentagem (%)",
+        xaxis_title='',
+        legend=dict(
+            orientation="h",
+            yanchor="bottom",
+            y=-0.3,  # Ajuste conforme necessário
+            xanchor="center",
+            x=0.5
+        ),
+        xaxis=dict(
+            showticklabels=False  # Remove os rótulos do eixo x
+        )
+    )
     
     st.plotly_chart(fig)
 

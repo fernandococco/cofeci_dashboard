@@ -63,8 +63,16 @@ def plot_bar_chart_perg49(df):
                  title='Você conhece o COFECI?', 
                  hole=0.4)  # hole=0.4 cria o efeito de rosca
     
-    fig.update_traces(textinfo='percent+label')
+    fig.update_traces(textinfo='percent')
     fig.update_layout(colorway=['#1dbde6','#f1515e'])  # Adicionando o color map
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ))
     st.plotly_chart(fig)
     
 def plot_bar_chart_perg50(df):
@@ -81,8 +89,15 @@ def plot_bar_chart_perg50(df):
                  title='O quanto você se sente representado pelo COFECI?', 
                  hole=0.4)  # hole=0.4 cria o efeito de rosca
     
-    fig.update_traces(textinfo='percent+label')
-    fig.update_layout(showlegend=False)  # Removendo a legenda
+    fig.update_traces(textinfo='percent')
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ))
     
     st.plotly_chart(fig)
 

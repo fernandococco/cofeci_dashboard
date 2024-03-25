@@ -62,19 +62,24 @@ def plot_bar_chart_perg42(df):
                  title='Vendeu imóvel nos últimos 12 meses?', 
                  hole=0.4)  # hole=0.4 cria o efeito de rosca
     
-    fig.update_traces(textinfo='percent+label')
+    fig.update_traces(textinfo='percent')
     fig.update_layout(colorway=['#1dbde6','#f1515e'])  # Adicionando o color map
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ))
     st.plotly_chart(fig)
     
 def plot_bar_chart_perg44(df):
-    # Cores especificadas para o gráfico
-    cores = ["#f94144", "#f3722c", "#f8961e", "#f9844a", "#f9c74f", 
-             "#90be6d", "#43aa8b", "#4d908e", "#577590", "#277da1"]
-    
+
     # Criando uma cópia do dataframe para não modificar o original
     temp_df = df.copy()
     
-    # Definindo as categorias com base na coluna 'PERG.43'
+    # Definindo as categorias com base na coluna 'PERG.44'
     bins = [0, 5, 10, 15, float('inf')]  # Define os limites das categorias
     labels = ['01 a 05', '06 a 10', '11 a 15', 'mais de 16']  # Rótulos para as categorias
     temp_df['Vendas_Categoria'] = pd.cut(temp_df['PERG.44'], bins=bins, labels=labels, right=True)
@@ -85,18 +90,41 @@ def plot_bar_chart_perg44(df):
     # Calculando porcentagens
     total = sales_counts.sum()
     sales_percentages = (sales_counts / total) * 100
-    
+    sales_percentages_df = sales_percentages.reset_index()
+    sales_percentages_df.columns = ['Vendas_Categoria', 'Porcentagem']
+
+    color_map = {
+        '01 a 05': '#118ab2',
+        '06 a 10': '#06d6a0',
+        '11 a 15': '#ffd166',
+        'mais de 16': '#ef476f'
+    }
+
     # Gerando o gráfico de barras
-    fig = px.bar(sales_percentages, 
-                 x=sales_percentages.index, 
-                 y=sales_percentages.values, 
-                 labels={'x': 'Faixa de Vendas', 'y': 'Porcentagem (%)'}, 
+    fig = px.bar(sales_percentages_df, 
+                 x='Vendas_Categoria', 
+                 y='Porcentagem',
                  title='Porcentagem de Imóveis Vendidos por Categoria',
-                 color=sales_percentages.values,  # Aplica o color mapping baseado nos valores
-                 color_continuous_scale=cores)  # Define o mapa de cores
+                 text='Porcentagem',
+                 color='Vendas_Categoria',  # Usa a coluna categórica para a cor
+                 color_discrete_map=color_map  # Usa o mapeamento de cores definido
+                )
+
+    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3,  # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                          showticklabels=False  # Remove os rótulos do eixo x
+                      ))
     
-    # Ajustando o layout para mostrar a barra de cores
-    fig.update_layout(coloraxis_showscale=False)
     st.plotly_chart(fig)
 
 

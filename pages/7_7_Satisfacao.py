@@ -71,12 +71,29 @@ def plot_bar_chart_perg51(df):
     # Gerando o gráfico de barras
     fig = px.bar(category_counts, 
                  x=category_counts.index, 
-                 y=category_counts.values, 
+                 y=category_counts.values,
+                 text= df['PERG.51'].value_counts(normalize=True) * 100,
                  labels={'x': 'Categoria de Renda', 'y': 'Porcentagem (%)'}, 
                  title='O quanto você está satisfeito com a profissão de corretor de imóveis?',
                  color=category_counts.index,  # Define a cor baseada na categoria
                  color_discrete_map=color_map)  # Aplica o mapeamento de cores
     
+    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                        tickmode='array',
+                        tickvals=[]
+                        ))
     st.plotly_chart(fig)
 
 

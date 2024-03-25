@@ -62,9 +62,24 @@ def plot_bar_chart_perg27(df):
     
     # Gerando o gráfico de barras
     fig = px.bar(counts, x='Respostas', y='Porcentagem', color='Respostas',
-                 title='Trabalho Atual',
+                 title='Trabalho Atual',text='Porcentagem',
                  labels={'Respostas': 'Respostas', 'Porcentagem': 'Porcentagem (%)'})
     
+    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                        tickmode='array',
+                        tickvals=[]
+                        ))
     st.plotly_chart(fig)
     
 
@@ -99,9 +114,24 @@ def plot_bar_chart_perg29(df):
     # Gerar o gráfico de barras
     fig = px.bar(df_porcentagens, x='Categoria', y='Porcentagem', 
                  title='Porcentagem de Atividades por Categoria em Relação ao Total de Respondentes', 
-                 color='Categoria',
+                 color='Categoria',text='Porcentagem',
                  labels={'Porcentagem': 'Porcentagem (%)', 'Categoria': 'Categoria'})
-                
+    
+    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                        tickmode='array',
+                        tickvals=[]
+                        ))
     st.plotly_chart(fig)
 
 data = load_data()

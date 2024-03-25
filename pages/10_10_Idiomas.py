@@ -65,6 +65,20 @@ def plot_bar_chart_perg26(df):
     fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
     fig.update_layout(xaxis_title="Idioma", yaxis_title="Porcentagem",
                       uniformtext_minsize=8, uniformtext_mode='hide')
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                        tickmode='array',
+                        tickvals=[]
+                        ))
     st.plotly_chart(fig)
 
 

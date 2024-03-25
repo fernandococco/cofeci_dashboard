@@ -50,8 +50,8 @@ with col2:
 
 def plot_bar_chart_perg46(df):
     # Definindo o mapa de cores
-    cores = ["#f94144", "#f3722c", "#f8961e", "#f9844a", "#f9c74f", 
-             "#90be6d", "#43aa8b", "#4d908e", "#577590", "#277da1"]
+    cores = ["#d00000", "#1565c0", "#009688", "#8bc34a", "#ffc107", 
+             "#ff9800", "#f44336", "#448aff", "#577590", "#277da1"]
     
     # Categorias de renda após substituir "k" por " mil"
     income_categories = {
@@ -68,20 +68,40 @@ def plot_bar_chart_perg46(df):
     
     # Calculando a porcentagem de cada categoria
     category_counts = df['PERG.46'].value_counts(normalize=True) * 100
+    category_percentages_df = category_counts.reset_index()
+    category_percentages_df.columns = ['Categoria de Renda', 'Porcentagem']
     
     # Preparando o mapeamento de cores para cada categoria
-    color_map = {category: cores[i % len(cores)] for i, category in enumerate(category_counts.index)}
+    color_map = {category: cores[i % len(cores)] for i, category in enumerate(income_categories.values())}
     
     # Gerando o gráfico de barras
-    fig = px.bar(category_counts, 
-                 x=category_counts.index, 
-                 y=category_counts.values, 
-                 labels={'x': 'Categoria de Renda', 'y': 'Porcentagem (%)'}, 
+    fig = px.bar(category_percentages_df, 
+                 x='Categoria de Renda', 
+                 y='Porcentagem', 
+                 labels={'y': 'Porcentagem (%)'}, 
                  title='Porcentagem de Respostas por Categoria de Renda',
-                 color=category_counts.index,  # Define a cor baseada na categoria
-                 color_discrete_map=color_map)  # Aplica o mapeamento de cores
+                 text='Porcentagem',
+                 color='Categoria de Renda',  # Usa a coluna categórica para a cor
+                 color_discrete_map=color_map  # Usa o mapeamento de cores definido
+                )
+
+    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3,  # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                          showticklabels=False  # Remove os rótulos do eixo x
+                      ))
     
     st.plotly_chart(fig)
+
 
 
 data = load_data()

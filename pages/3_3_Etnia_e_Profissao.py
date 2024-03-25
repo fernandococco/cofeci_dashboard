@@ -84,8 +84,20 @@ def plot_bar_chart_perg13(df):
     
     # Ajustes finais no gráfico
     fig.update_traces(texttemplate='%{text:.2s}%')
-    fig.update_layout(xaxis_title="Categoria", yaxis_title="Porcentagem (%)", xaxis={'categoryorder':'total descending'})
-    
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                        tickmode='array',
+                        tickvals=[]
+                        ))
     # Exibindo o gráfico
     st.plotly_chart(fig) 
 
@@ -115,15 +127,28 @@ def plot_bar_chart_perg14(df):
     df_agrupado['Porcentagem'] *= 100
 
     # Cores da imagem enviada
-    cores = ["#f94144", "#f3722c", "#f8961e", "#f9844a", "#f9c74f", "#90be6d", "#43aa8b", "#4d908e", "#577590", "#277da1"]
+    cores = ["#ff595e", "#ff924c", "#ffca3a", "#c5ca30", "#8ac926", "#36949d", "#6a4c93", "#ffb2e6", "#000e14", "#fdf3ea"]
 
     # Criando o gráfico de barras com as cores especificadas
     fig = px.bar(df_agrupado, x='Resposta', y='Porcentagem', title='Possui outra profissão além de corretor?',
                  text='Porcentagem', color='Resposta', color_discrete_sequence=cores)
 
     # Ajustes finais no gráfico
-    fig.update_layout(xaxis_title="Profissão", yaxis_title="Porcentagem (%)", xaxis={'categoryorder':'total descending'})
     fig.update_traces(texttemplate='%{text:.2f}%')
+    fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
+                      yaxis_title="Porcentagem (%)",
+                      xaxis_title='',
+                      legend=dict(
+                          orientation="h",
+                          yanchor="bottom",
+                          y=-0.3, # Ajuste conforme necessário
+                          xanchor="center",
+                          x=0.5
+                      ),
+                      xaxis=dict(
+                        tickmode='array',
+                        tickvals=[]
+                        ))
 
     st.plotly_chart(fig)
 # Carregar os dados
