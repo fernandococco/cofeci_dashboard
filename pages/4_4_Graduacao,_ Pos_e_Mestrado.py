@@ -31,7 +31,7 @@ if not check_password():
 # Função para carregar os dados
 @st.cache_data
 def load_data():
-    return pd.read_csv('cofeci.csv')
+    return pd.read_csv('cofeci2.csv')
 
 col1, col_empty, col2 = st.columns([1, 2, 1])
 
@@ -44,41 +44,24 @@ with col2:
     st.image('125.1_LOGO REI-01.png', width=100)  # Ajuste a largura conforme necessário
 
 
-def plot_bar_chart_perg17(df):
-    # Dicionário para mapear respostas para suas categorias normalizadas
-    normalized_responses = {
-        "administração": "Administração",
-        "administrativo": "Administração",
-        "adm": "Administração",
-        "adm.": "Administração",
-        "direito": "Direito",
-        "advogado": "Direito",
-        "engenharia": "Engenharia",
-        "engenheiro": "Engenharia",
-        "eng.": "Engenharia",
-        "ciências contábeis": "Ciências Contábeis",
-        "contabilidade": "Ciências Contábeis",
-        "contábeis": "Ciências Contábeis",
-        "contabeis": "Ciências Contábeis",
-        "ciencias contabeis": "Ciências Contábeis",
-        "pedagogia": "Pedagogia",
-        "pedagodia": "Pedagogia",
-        "pedagog": "Pedagogia",
-        'Nao': 'Não Possui Graduação', # Adicionando esta linha
-    }
+def plot_bar_chart_perg18(df):
+    # Categorias específicas para manter
+    categorias_especificas = ["Administração", "Direito", "Engenharia", "Ciências Contábeis", "Pedagogia"]
     
-    # Função para normalizar as respostas
-    def normalize_response(text):
-        if pd.isnull(text):
+    # Função para categorizar as respostas
+    def categorizar_resposta(text):
+        if text in categorias_especificas:
+            return text
+        elif text == "Não":
+            return None  # Retorna None para as respostas "Não", que serão removidas
+        else:
             return "Outros"
-        text = str(text).lower().strip(". ").replace("á", "a").replace("ã", "a").replace("ç", "c").replace("é", "e").replace("ê", "e")
-        for key, normalized in normalized_responses.items():
-            if key.lower() in text:
-                return normalized
-        return "Outros"
     
-    # Aplica a função de normalização para cada resposta
-    df['Categoria'] = df['PERG.17'].apply(normalize_response)
+    # Aplica a função de categorização para cada resposta
+    df['Categoria'] = df['PERG.18'].apply(categorizar_resposta)
+
+    # Remove as entradas com categoria None (respostas "Não")
+    df = df.dropna(subset=['Categoria'])
 
     # Contagem de quantidades por categoria e conversão para porcentagem
     df_agrupado = df['Categoria'].value_counts(normalize=True).reset_index()
@@ -86,14 +69,14 @@ def plot_bar_chart_perg17(df):
     df_agrupado['Porcentagem'] *= 100
     
     # Cores para o gráfico
-    cores = ['#FFA07A', '#20B2AA', '#778899', '#9370DB', '#3CB371', '#FFD700','#4361ee']
+    cores = ['#FFA07A', '#20B2AA', '#778899', '#9370DB', '#3CB371', '#FFD700', '#4361ee']
 
     # Criando o gráfico de barras
     fig = px.bar(df_agrupado, x='Categoria', y='Porcentagem', title='Áreas de Formação',
                  text='Porcentagem', color='Categoria', color_discrete_sequence=cores)
 
     # Ajustes finais no gráfico
-    fig.update_traces(texttemplate='%{text:.2s}%')
+    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
     fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
                       yaxis_title="Porcentagem (%)",
                       xaxis_title='',
@@ -111,73 +94,34 @@ def plot_bar_chart_perg17(df):
     st.plotly_chart(fig)
 
 
-def normalize_category(cat):
-    if pd.isnull(cat):
-        return "Outros"
-    cat = str(cat).lower().strip()
-    # Normalize the categories based on keywords
-    if 'direito imobiliário' in cat or 'direito imob' in cat:
-        return "Direito Imobiliário"
-    if 'direito' in cat:
-        return "Direito"
-    if 'administração' in cat or 'adm' in cat:
-        return "Administração"
-    if 'marketing' in cat:
-        return "Marketing"
-    if 'mba' in cat:
-        return "MBA"
-    return "Outros"
+def plot_bar_chart_perg20(df):
+    # Remover valores nulos da coluna "PERG.22"
+    df = df.dropna(subset=['PERG.20'])
 
-def plot_bar_chart_perg19(df, column):
-
-    color_map = {
-    "Direito Imobiliário": '#264653',
-    "Direito": '#287271',
-    "Administração": '#2a9d8f',
-    "Marketing": '#e9c46a',
-    "MBA": '#f4a261',
-    "Outros": '#e76f51'
-    }
-    # Apply the normalization function
-    df['Normalized'] = df[column].apply(normalize_category)
+    # Definindo as categorias específicas para manter
+    categorias_especificas = ["Direito", "Direito Imobiliário","Administração","Marketing","MBA"]
     
-    # Filter out the 'Outros' category
-    filtered_df = df[df['Normalized'] != 'Outros']
+    # Função para agrupar as respostas
+    def agrupar_respostas(valor):
+        if valor in categorias_especificas:
+            return valor
+        else:
+            return "Outros"
     
-    # Count the occurrences of each category
-    category_counts = filtered_df['Normalized'].value_counts()
-    # Convert the counts to percentages
-    category_percentages = category_counts / category_counts.sum() * 100
+    # Aplicando a função de agrupamento na coluna de interesse
+    df['Categoria'] = df['PERG.20'].apply(agrupar_respostas)
     
-    # Prepare the data for plotting
-    plot_data = pd.DataFrame({
-        'Categoria': category_percentages.index,
-        'Porcentagem': category_percentages.values
-    })
+    # Contagem de quantidades por categoria e conversão para porcentagem
+    df_agrupado = df['Categoria'].value_counts(normalize=True).reset_index()
+    df_agrupado.columns = ['Categoria', 'Porcentagem']
+    df_agrupado['Porcentagem'] *= 100  # Convertendo para porcentagem
     
-    # Map the color for each category
-    plot_data['Color'] = plot_data['Categoria'].map(color_map)
+    # Criando o gráfico de barras
+    fig = px.bar(df_agrupado, x='Categoria', y='Porcentagem', title='Áreas de Pós-Graduação',
+                 text='Porcentagem', color='Categoria')
     
-    # Create the bar chart
-    fig = px.bar(
-        plot_data,
-        x='Categoria',
-        y='Porcentagem',
-        title='Áreas de Pós Graduação',
-        text='Porcentagem',
-        color='Categoria',
-        color_discrete_map=color_map
-    )
-    
-    # Customize the layout
-    fig.update_layout(
-        xaxis_title='Categoria',
-        yaxis_title='Porcentagem (%)',
-        showlegend=True
-    )
-    
-    # Customize the text on the bars
-    fig.update_traces(texttemplate='%{text:.2f}%')
+    # Personalizando o texto nas barras para mostrar a porcentagem com duas casas decimais
+    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
     fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
                       yaxis_title="Porcentagem (%)",
                       xaxis_title='',
@@ -192,59 +136,37 @@ def plot_bar_chart_perg19(df, column):
                         tickmode='array',
                         tickvals=[]
                         ))
-    # Show the figure
+    # Exibir o gráfico no Streamlit
     st.plotly_chart(fig)
 
-def normalize_category_perg21(cat):
-    cat_lower = str(cat).lower()
-    # Qualquer resposta que seja uma variação de "não" ou "99" ou similar será descartada
-    if "não" in cat_lower or "nao" in cat_lower or cat_lower == "n" or cat_lower == "99":
-        return "Não/Descarte"
-    
-    if "mba" in cat_lower:
-        return "MBA"
-    if "administração" in cat_lower or "adm" in cat_lower:
-        return "Administração"
-    
-    return "Outros"
 
-def plot_bar_chart_perg21(df, column):
-    color_map = {
-        "Administração": '#2a9d8f',
-        "MBA": '#f4a261',
-    }
-    # Apply the normalization function
-    df['Normalized'] = df[column].apply(normalize_category_perg21)
-    
-    # Remover categorias que queremos excluir (ou seja, 'Outros')
-    filtered_df = df[df['Normalized'] != 'Não/Descarte']
+def plot_bar_chart_perg22(df):
+    # Remover valores nulos da coluna "PERG.22"
+    df = df.dropna(subset=['PERG.22'])
 
-    # Count the occurrences of each category
-    category_counts = filtered_df['Normalized'].value_counts()
-    # Convert the counts to percentages
-    category_percentages = category_counts / category_counts.sum() * 100
+    # Definindo as categorias específicas para manter
+    categorias_especificas = ["MBA", "Administração"]
     
-    # Prepare the data for plotting
-    plot_data = pd.DataFrame({
-        'Categoria': category_percentages.index,
-        'Porcentagem': category_percentages.values
-    })
+    # Função para agrupar as respostas
+    def agrupar_respostas(valor):
+        if valor in categorias_especificas:
+            return valor
+        else:
+            return "Outros"
     
-    # Map the color for each category
-    plot_data['Color'] = plot_data['Categoria'].map(color_map)
+    # Aplicando a função de agrupamento na coluna de interesse
+    df['Categoria'] = df['PERG.22'].apply(agrupar_respostas)
     
-    # Create the bar chart
-    fig = px.bar(
-        plot_data,
-        x='Categoria',
-        y='Porcentagem',
-        title='Áreas de Formação - PERG.21',
-        text='Porcentagem',
-        color='Categoria',
-        color_discrete_map=color_map
-    )
+    # Contagem de quantidades por categoria e conversão para porcentagem
+    df_agrupado = df['Categoria'].value_counts(normalize=True).reset_index()
+    df_agrupado.columns = ['Categoria', 'Porcentagem']
+    df_agrupado['Porcentagem'] *= 100  # Convertendo para porcentagem
     
-    # Customize the layout
+    # Criando o gráfico de barras
+    fig = px.bar(df_agrupado, x='Categoria', y='Porcentagem', title='Áreas de Mestrado',
+                 text='Porcentagem', color='Categoria')
+    
+    fig.update_traces(texttemplate='%{text:.2f}%', textposition='outside')
     fig.update_layout(uniformtext_minsize=8, uniformtext_mode='hide',
                       yaxis_title="Porcentagem (%)",
                       xaxis_title='',
@@ -260,11 +182,9 @@ def plot_bar_chart_perg21(df, column):
                         tickvals=[]
                         ))
     
-    # Customize the text on the bars
-    fig.update_traces(texttemplate='%{text:.2f}%')
-    
-    # Show the figure using Streamlit
+    # Exibir o gráfico no Streamlit
     st.plotly_chart(fig)
+
 
 # Carregar os dados
 data = load_data()
@@ -401,9 +321,9 @@ if selected_regiao != 'Selecione uma opção':
             filtered_data = filtered_data[filtered_data['PERG.9'].isin(st.session_state['selected_sexo'])]
 
             # Aqui continuam as funções de plotagem ou exibição de dados que já estavam sendo utilizadas
-            plot_bar_chart_perg17(filtered_data)
-            plot_bar_chart_perg19(filtered_data,'PERG.19')
-            plot_bar_chart_perg21(filtered_data,'PERG.21')
+            plot_bar_chart_perg18(filtered_data)
+            plot_bar_chart_perg20(filtered_data)
+            plot_bar_chart_perg22(filtered_data)
 
 else:
     st.write("Selecione os filtros para visualizar os dados.")

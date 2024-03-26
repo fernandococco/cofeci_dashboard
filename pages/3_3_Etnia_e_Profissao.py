@@ -110,10 +110,6 @@ def plot_bar_chart_perg14(df):
         "Advogado(a)",
         "Empresário(a)",
         "Funcionário público",
-        "Aposentado",
-        "Comerciante",
-        "Engenheiro(a)",
-        "Professor(a)"
     ]
     
     # Cria uma nova coluna 'Categoria' no DataFrame
